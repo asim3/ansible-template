@@ -1,0 +1,16 @@
+- name: Setup And Update Docker Station
+  hosts: docker_station
+  any_errors_fatal: true
+  roles:
+    - update-packages
+    - install-docker
+
+  post_tasks:
+    - name: Reboot the machine if today is friday
+      become: yes
+      become_user: root
+      ansible.builtin.reboot:
+        post_reboot_delay: 10
+        connect_timeout: 5
+        reboot_timeout: 300
+      when: ansible_date_time.weekday_number == "5"

@@ -1,0 +1,54 @@
+- name: Set timezone to Asia/Riyadh
+  become: yes
+  become_user: root
+  community.general.timezone:
+    name: Asia/Riyadh
+
+- name: Set The Hostname Local IP
+  become: yes
+  become_user: root
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: 127.0.1.1  {{ inventory_hostname }}
+    insertbefore: BOF
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Set The Hostname
+  become: yes
+  become_user: root
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Update all packages to their latest version using yum
+  become: yes
+  become_user: root
+  ansible.builtin.yum:
+    name: "*"
+    state: latest
+    update_cache: true
+
+- name: Fix and clean all packages using yum
+  become: yes
+  become_user: root
+  ansible.builtin.yum:
+    autoremove: true
+
+- name: Install basic packages using yum
+  become: yes
+  become_user: root
+  ansible.builtin.yum:
+    name:
+      - make
+      - git
+      - curl
+      - tree
+      - nano
+      - net-tools
+      - bind-utils
+      - iputils
+      - bash-completion
+      - python3-pip
+    state: latest
+    update_cache: true

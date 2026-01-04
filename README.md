@@ -1,5 +1,4 @@
 # Ansible Template
-[Best Practices](https://www.youtube.com/watch?v=vYpPGCaKs3I)
 
 
 ## Setup New AlmaLinux
@@ -19,10 +18,7 @@ sudo useradd --shell /bin/bash --no-log-init --create-home --uid 1234 --groups w
 ```bash
 pip install -r requirements.txt
 
-ansible-galaxy collection install ansible.posix
-ansible-galaxy collection install community.docker
-ansible-galaxy collection install community.general
-ansible-galaxy collection install community.postgresql
+ansible-galaxy collection install ansible.posix community.docker community.general community.postgresql
 
 ansible --version
 ansible-community --version

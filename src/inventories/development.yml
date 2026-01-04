@@ -33,3 +33,22 @@ development:
         nfs-1:
           ansible_host: 192.168.122.2
           private_ip_address: 192.168.122.2
+    databases:
+      hosts:
+        postgresql-1:
+          ansible_host: 192.168.122.161
+          private_ip_address: 192.168.122.161
+      vars:
+        database:
+          - user: user_8
+            pass: my-pass-8
+            db: new_db_8
+          - user: user_9
+            pass: my-pass-9
+            db: new_db_9
+          - user: user_10
+            pass: my-pass-10
+            db: new_db_10
+        allowed_remote_servers:
+          - ip: 192.168.122.200
+            port: 5432

@@ -12,16 +12,16 @@ development:
     docker_station:
       hosts:
         docker-station-0:
-          ansible_host: 127.0.0.1
-          private_ip_address: 127.0.0.1
+          ansible_host: 192.168.122.144
+          private_ip_address: 192.168.122.144
     mysql:
       hosts:
         # mysql-1:
         #   ansible_host: 192.168.122.155
         #   private_ip_address: 192.168.122.155
         # mysql-2:
-        #   ansible_host: 192.168.122.89
-        #   private_ip_address: 192.168.122.89
+        #   ansible_host: 192.168.122.189
+        #   private_ip_address: 192.168.122.189
         # mysql-3:
         #   ansible_host: 192.168.122.97
         #   private_ip_address: 192.168.122.97

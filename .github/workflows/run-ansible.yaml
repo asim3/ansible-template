@@ -16,7 +16,7 @@ jobs:
       - run: ansible-community --version
       - run: ansible-playbook --version
       - run: ansible-galaxy --version
-      #- run: cd ./src && ansible-playbook -i inventories/development.yml --vault-password-file ${HOME}/.ssh/vault_pass playbooks/setup-docker-station.yml
-      - run: cd ./src && ansible-playbook -i inventories/development.yml playbooks/setup-docker-station.yml
+      #- run: cd ./src && ansible-playbook -i inventories/development.yml --vault-password-file ${HOME}/.ssh/vault_pass playbooks/setup-localhost.yml
+      - run: cd ./src && ansible-playbook -i inventories/development.yml playbooks/setup-localhost.yml
         env:
           ANSIBLE_ROLES_PATH: "./roles/v0.1:./roles/v0.2:./roles/v0.3:./roles/v1.0"

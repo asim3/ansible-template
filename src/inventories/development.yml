@@ -8,8 +8,7 @@ development:
     docker_station:
       hosts:
         localhost:
-          vars:
-            ansible_connection: local
+          ansible_connection: local
         # docker-station-0:
         #   ansible_host: 127.0.0.1
         #   private_ip_address: 127.0.0.1

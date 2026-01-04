@@ -7,9 +7,12 @@ development:
   children:
     docker_station:
       hosts:
-        docker-station-0:
-          ansible_host: 127.0.0.1
-          private_ip_address: 127.0.0.1
+        localhost-1:
+          vars:
+            ansible_connection: local
+        # docker-station-0:
+        #   ansible_host: 127.0.0.1
+        #   private_ip_address: 127.0.0.1
     mysql:
       hosts:
         # mysql-1:

@@ -21,34 +21,5 @@
   ansible.builtin.hostname:
     name: "{{ inventory_hostname }}"
 
-- name: Update all packages to their latest version using yum
-  become: yes
-  become_user: root
-  ansible.builtin.yum:
-    name: "*"
-    state: latest
-    update_cache: true
-
-- name: Fix and clean all packages using yum
-  become: yes
-  become_user: root
-  ansible.builtin.yum:
-    autoremove: true
-
-- name: Install basic packages using yum
-  become: yes
-  become_user: root
-  ansible.builtin.yum:
-    name:
-      - make
-      - git
-      - curl
-      - tree
-      - nano
-      - net-tools
-      - bind-utils
-      - iputils
-      - bash-completion
-      - python3-pip
-    state: latest
-    update_cache: true
+- name: Include tasks base on OS family
+  include_tasks: "{{ ansible_facts['os_family']|lower }}.yml"

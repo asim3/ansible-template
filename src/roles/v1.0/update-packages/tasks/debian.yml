@@ -1,0 +1,55 @@
+- name: Fix broken packages using apt
+  become: yes
+  become_user: root
+  ansible.builtin.apt:
+    state: fixed
+    autoremove: yes
+
+- name: Update all packages to their latest version using apt
+  become: yes
+  become_user: root
+  ansible.builtin.apt:
+    name: "*"
+    state: latest
+    update_cache: true
+  retries: 5
+  delay: 3
+  register: result
+  until: not result.failed
+
+- name: Fix and clean all packages using apt
+  become: yes
+  become_user: root
+  ansible.builtin.apt:
+    state: fixed
+    upgrade: yes
+    autoclean: yes
+    autoremove: yes
+  retries: 5
+  delay: 3
+  register: result
+  until: not result.failed
+
+- name: Install basic packages using apt
+  become: yes
+  become_user: root
+  ansible.builtin.apt:
+    pkg:
+      - gnupg
+      - bash-completion
+      - make
+      - curl
+      - nano
+      - git
+      - tree
+      - dnsutils
+      - net-tools
+      - iputils-ping
+      - unattended-upgrades
+      - locales-all
+      - python3-pip
+
+- name: APT Enable Automatic Updates
+  become: yes
+  become_user: root
+  shell: dpkg-reconfigure -f noninteractive --priority=low unattended-upgrades

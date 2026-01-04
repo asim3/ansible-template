@@ -1,0 +1,122 @@
+- name: Collect PostgreSQL Settings
+  community.postgresql.postgresql_info:
+    login_user: "{{ ansible_ssh_user }}"
+    login_db: postgres
+    filter: settings
+  register: postgresql_info_results
+
+- name: Setup PostgreSQL Users
+  community.postgresql.postgresql_user:
+    login_user: "{{ ansible_ssh_user }}"
+    login_db: postgres
+    name: "{{ item.user }}"
+    password: "{{ item.pass }}"
+    state: present
+  loop: "{{ database }}"
+  loop_control:
+      label: "CREATE USER {{ item.user }} WITH PASSWORD '****';"
+
+- name: Setup PostgreSQL Databases
+  community.postgresql.postgresql_db:
+    login_user: "{{ ansible_ssh_user }}"
+    name: "{{ item.db }}"
+    owner: "{{ item.user }}"
+    state: present
+    encoding: UTF-8
+  loop: "{{ database }}"
+  loop_control:
+      label: "CREATE DATABASE {{ item.db }} OWNER {{ item.user }};"
+
+- name: Setup PostgreSQL Schema
+  community.postgresql.postgresql_schema:
+    login_user: "{{ ansible_ssh_user }}"
+    login_db: "{{ item.db }}"
+    name: main
+    owner: "{{ item.user }}"
+  loop: "{{ database }}"
+  loop_control:
+      label: "CREATE SCHEMA main AUTHORIZATION {{ item.user }};"
+
+- name: DROP Public SCHEMA
+  community.postgresql.postgresql_schema:
+    login_user: "{{ ansible_ssh_user }}"
+    login_db: "{{ item.db }}"
+    name: public
+    state: absent
+    cascade_drop: true
+  loop: "{{ database }}"
+  loop_control:
+      label: "Drop public schema from {{ item.db }}"
+
+- name: Set The Schema Search Path
+  community.postgresql.postgresql_set:
+    login_user: "{{ ansible_ssh_user }}"
+    login_db: postgres
+    name: search_path
+    value: "$user,main,public"
+
+- name: Set The Listen Addresses
+  community.postgresql.postgresql_set:
+    login_user: "{{ ansible_ssh_user }}"
+    login_db: postgres
+    name: listen_addresses
+    value: "0.0.0.0"
+  register: set_listen_addresses
+
+- name: Grant PostgreSQL Users Access From Private IP
+  become: yes
+  become_user: root
+  community.postgresql.postgresql_pg_hba:
+    dest: "{{ postgresql_info_results.settings.hba_file.setting }}"
+    create: true
+    backup: true
+    backup_file: "{{ postgresql_info_results.settings.hba_file.setting }}.{{ ansible_date_time['epoch'] }}.befor-{{ hostvars[item].private_ip_address }}.old"
+    address: "{{ hostvars[item].private_ip_address }}"
+    contype: host
+    method: md5
+    users: all
+    databases: all
+  loop: "{{ query('inventory_hostnames', 'swarm') }}"
+  loop_control:
+      label: "Grant all access from {{ hostvars[item].private_ip_address }}"
+  register: grant_users_access_from_private
+
+- name: Grant PostgreSQL Users Access From Remote IP
+  become: yes
+  become_user: root
+  community.postgresql.postgresql_pg_hba:
+    dest: "{{ postgresql_info_results.settings.hba_file.setting }}"
+    create: true
+    backup: true
+    backup_file: "{{ postgresql_info_results.settings.hba_file.setting }}.{{ ansible_date_time['epoch'] }}.befor-{{ item.ip }}.old"
+    address: "{{ item.ip }}"
+    contype: host
+    method: md5
+    users: all
+    databases: all
+  loop: "{{ allowed_remote_servers }}"
+  loop_control:
+      label: "Grant all access from remote IP {{ item.ip }}"
+  register: grant_users_access_from_remote
+
+- name: Restart PostgreSQL
+  become: yes
+  become_user: root
+  ansible.builtin.service:
+    name: "postgresql"
+    enabled: true
+    state: restarted
+  when: set_listen_addresses.changed or grant_users_access_from_private.changed or grant_users_access_from_remote.changed
+
+- name: Test PostgreSQL Localhost Connection
+  shell: psql postgresql://{{ item.user }}:{{ item.pass }}@localhost:5432/{{ item.db }} -c "\l"
+  loop: "{{ database }}"
+  loop_control:
+      label: "Test {{ item.user }} Localhost Connection"
+
+# TODO
+# - name: Test PostgreSQL Private IP Connection
+#   shell: psql postgresql://{{ item.user }}:{{ item.pass }}@{{ hostvars['nfs-1'].private_ip_address }}:5432/{{ item.db }} -c "\l"
+#   loop: "{{ database }}"
+#   loop_control:
+#       label: "Test {{ item.user }} IP Connection"

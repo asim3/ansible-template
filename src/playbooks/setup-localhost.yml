@@ -3,4 +3,5 @@
   any_errors_fatal: true
   roles:
     - update-packages
-    - install-postgresql
+    # - install-postgresql
+    # - setup-postgresql

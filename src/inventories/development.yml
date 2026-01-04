@@ -7,7 +7,7 @@ development:
   children:
     docker_station:
       hosts:
-        localhost-1:
+        localhost:
           vars:
             ansible_connection: local
         # docker-station-0:

@@ -1,0 +1,5 @@
+- name: Setup And Update localhost
+  hosts: local_host
+  any_errors_fatal: true
+  roles:
+    - update-packages

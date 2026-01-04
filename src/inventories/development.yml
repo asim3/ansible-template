@@ -5,13 +5,15 @@ development:
     ansible_python_interpreter: /usr/bin/python3
     ansible_port: 22
   children:
-    docker_station:
+    local_host:
       hosts:
         localhost:
           ansible_connection: local
-        # docker-station-0:
-        #   ansible_host: 127.0.0.1
-        #   private_ip_address: 127.0.0.1
+    docker_station:
+      hosts:
+        docker-station-0:
+          ansible_host: 127.0.0.1
+          private_ip_address: 127.0.0.1
     mysql:
       hosts:
         # mysql-1:

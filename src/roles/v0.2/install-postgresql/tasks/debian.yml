@@ -1,0 +1,15 @@
+- name: Install PostgreSQL
+  become: yes
+  become_user: root
+  ansible.builtin.apt:
+    pkg:
+      - gcc
+      - musl-dev
+      - libpq-dev
+      - python3-dev
+      - python3-pip
+      - python3-psycopg2
+      - postgresql
+      - postgresql-contrib
+    state: latest
+    update_cache: true

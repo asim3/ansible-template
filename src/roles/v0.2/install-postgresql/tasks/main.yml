@@ -1,0 +1,14 @@
+- name: Include tasks base on OS family
+  include_tasks: "{{ ansible_facts['os_family']|lower }}.yml"
+
+- name: Setup Ansible PostgreSQL User & Database
+  become: yes
+  become_user: root
+  shell: sudo -u {{ ansible_ssh_user }} psql postgres -c "\du" || sudo -u postgres psql postgres -c "CREATE USER {{ ansible_ssh_user }} SUPERUSER;"
+
+- name: Set PostgreSQL TimeZone
+  community.postgresql.postgresql_set:
+    login_user: "{{ ansible_ssh_user }}"
+    login_db: postgres
+    name: TimeZone
+    value: Asia/Riyadh
